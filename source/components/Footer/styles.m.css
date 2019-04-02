@@ -1,0 +1,11 @@
+@import '../../theme/palette';
+@import '../../theme/breakpoints';
+
+.completeAllTasks {
+    font-size: 20px;
+    color: var(--paletteColor7);
+
+    @media (width <= 840px) {
+        font-size: 18px;
+    }
+}

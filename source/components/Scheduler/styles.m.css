@@ -122,11 +122,6 @@
                 margin: 0 20px;
                 cursor: pointer;
             }
-
-            & .completeAllTasks {
-                font-size: 20px;
-                color: var(--paletteColor7);
-            }
         }
     }
 
@@ -173,10 +168,6 @@
 
             & footer {
                 margin-bottom: 14px;
-
-                & .completeAllTasks {
-                    font-size: 18px;
-                }
             }
         }
     }

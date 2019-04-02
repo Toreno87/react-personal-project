@@ -38,7 +38,9 @@
             border-color: transparent;
 
             &:not([disabled]) {
-                border-color: var(--paletteColor3);
+                &:focused {
+                    border-color: var(--paletteColor3);
+                }
             }
         }
     }

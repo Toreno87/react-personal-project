@@ -5,10 +5,11 @@ import React, { PureComponent } from 'react';
 import Styles from './styles.m.css';
 
 // Components
-import Checkbox from '../../theme/assets/Checkbox';
-import Star from '../../theme/assets/Star';
-import Edit from '../../theme/assets/Edit';
-import Remove from '../../theme/assets/Remove';
+import Checkbox from 'theme/assets/Checkbox';
+import Star from 'theme/assets/Star';
+import Edit from 'theme/assets/Edit';
+import Remove from 'theme/assets/Remove';
+import { Consumer } from 'components/HOC/withProfile';
 
 export default class Task extends PureComponent {
     _getTaskShape = ({
@@ -24,44 +25,48 @@ export default class Task extends PureComponent {
     });
 
     render () {
-        const maxLengthInput = 50;
-        const isDisabled = true;
-        const complite = false;
+        const {
+            isDisabled,
+            toggleTaskCompletedState,
+            maxLengthInput,
+            palleteBlue,
+            palleteWhite,
+        } = this.props;
 
         return (
             <li className = { Styles.task }>
                 <div className = { Styles.content }>
                     <Checkbox
                         inlineBlock
-                        checked = { complite }
+                        checked = { toggleTaskCompletedState }
                         className = { Styles.toggleTaskCompletedState }
-                        color1 = '#3B8EF3'
-                        color2 = '#FFF'
+                        color1 = { palleteBlue }
+                        color2 = { palleteWhite }
                     />
                     <input
                         type = 'text'
-                        maxLength = { maxLengthInput }
                         disabled = { isDisabled }
-                        value = 'тут будет какой-то текст...'
+                        maxLength = { maxLengthInput }
+                        placeholder = { `тут будет какой-то текст...` }
                     />
                 </div>
                 <div className = { Styles.actions }>
                     <Star
                         inlineBlock
                         className = { Styles.toggleTaskFavoriteState }
-                        color1 = '#3B8EF3'
-                        color2 = '#323232'
+                        color1 = { palleteBlue }
+                        color2 = { palleteWhite }
                     />
                     <Edit
                         inlineBlock
                         className = { Styles.updateTaskMessageOnClick }
-                        color1 = '#3B8EF3'
-                        color2 = '#323232'
+                        color1 = { palleteBlue }
+                        color2 = { palleteWhite }
                     />
                     <Remove
                         inlineBlock
-                        color1 = '#3B8EF3'
-                        color2 = '#323232'
+                        color1 = { palleteBlue }
+                        color2 = { palleteWhite }
                     />
                 </div>
             </li>
