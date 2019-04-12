@@ -9,7 +9,6 @@ import { Provider } from 'components/HOC/withProfile';
 const options = {
     isDisabled: true,
     maxLengthInput: 50,
-    toggleTaskCompletedState: false,
     pallete: {
         blue: '#3B8EF3',
         dark: '#323232',

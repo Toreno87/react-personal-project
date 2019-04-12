@@ -1,4 +1,5 @@
 @import '../../theme/breakpoints';
+@import '../../theme/palette';
 
 .task {
     position: relative;
