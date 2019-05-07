@@ -100,7 +100,6 @@ export default class Task extends PureComponent {
         const enterKey = event.key === 'Enter';
         const escapeKey = event.key === 'Escape';
         const { newMessage } = this.state;
-        const { message } = this.props;
 
         if (newMessage === '') {
             return null;
@@ -111,15 +110,17 @@ export default class Task extends PureComponent {
         }
 
         if (escapeKey) {
-            this._cancelUpdatingTaskMessage(message);
+            this._cancelUpdatingTaskMessage();
         }
     }
 
-    _cancelUpdatingTaskMessage = (oldMessage) => {
+    _cancelUpdatingTaskMessage = () => {
+        const { message } = this.props;
+
         this.taskInput.current.disabled = true;
 
         this.setState({
-            newMessage: oldMessage,
+            newMessage: message,
             isTaskEditing: false,
         });
     }
