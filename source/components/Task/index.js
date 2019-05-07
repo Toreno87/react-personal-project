@@ -1,6 +1,7 @@
 // Core
 import React, { PureComponent } from 'react';
 import { string, bool } from 'prop-types';
+import cx from 'classnames';
 
 // Instruments
 import Styles from './styles.m.css';
@@ -41,11 +42,8 @@ export default class Task extends PureComponent {
     });
 
     _toggleTaskCompletedState = () => {
-        const { _updateTaskAsync } = this.props;
-        const { completed } = this.props;
-        const taskShape = this._getTaskShape({});
-
-        taskShape.completed = !completed;
+        const { _updateTaskAsync, completed } = this.props;
+        const taskShape = this._getTaskShape({ completed: !completed });
 
         _updateTaskAsync(taskShape);
 
@@ -55,11 +53,8 @@ export default class Task extends PureComponent {
     }
 
     _toggleTaskFavoriteState = () => {
-        const { _updateTaskAsync } = this.props;
-        const { favorite } = this.props;
-        const taskShape = this._getTaskShape({});
-
-        taskShape.favorite = !favorite;
+        const { _updateTaskAsync, favorite } = this.props;
+        const taskShape = this._getTaskShape({ favorite: !favorite });
 
         _updateTaskAsync(taskShape);
 
@@ -105,6 +100,7 @@ export default class Task extends PureComponent {
         const enterKey = event.key === 'Enter';
         const escapeKey = event.key === 'Escape';
         const { newMessage } = this.state;
+        const { message } = this.props;
 
         if (newMessage === '') {
             return null;
@@ -115,15 +111,15 @@ export default class Task extends PureComponent {
         }
 
         if (escapeKey) {
-            this._cancelUpdatingTaskMessage();
+            this._cancelUpdatingTaskMessage(message);
         }
     }
 
-    _cancelUpdatingTaskMessage = () => {
+    _cancelUpdatingTaskMessage = (oldMessage) => {
         this.taskInput.current.disabled = true;
 
         this.setState({
-            newMessage: this.props.message,
+            newMessage: oldMessage,
             isTaskEditing: false,
         });
     }
@@ -148,12 +144,17 @@ export default class Task extends PureComponent {
     }
 
     render () {
-        const { newMessage, favorite, completed, isTaskEditing } = this.state;
+        const { completed } = this.props;
+        const { newMessage, favorite } = this.state;
         const { taskInput } = this;
+
+        const completedTaskStyle = cx(Styles.task, {
+            [Styles.completed]: completed,
+        });
 
         return (
 
-            <li className = { Styles.task } >
+            <li className = { completedTaskStyle } >
                 <div className = { Styles.content }>
                     <Checkbox
                         checked = { completed }
@@ -197,7 +198,6 @@ export default class Task extends PureComponent {
                         width = { 19 }
                     />
                     <Remove
-                        checked = { false }
                         className = { Styles.removeTask }
                         color1 = { '#3B8EF3' }
                         color2 = { '#000' }

@@ -23,7 +23,7 @@ const decorateSvg = (
 
         state = {
             hover:   false,
-            checked: !this.props.checked,
+            checked: false,
         };
 
         _getEnhanceableProps = () => {

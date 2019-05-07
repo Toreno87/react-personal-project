@@ -9,7 +9,7 @@ import Sheduler from 'components/Scheduler';
 export default class App extends Component {
     render () {
         return (
-            <Sheduler/>
+            <Sheduler />
         );
     }
 }

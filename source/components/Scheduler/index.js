@@ -1,5 +1,6 @@
 // Core
 import React, { Component } from 'react';
+import FlipMove from 'react-flip-move';
 
 // Instruments
 import Styles from './styles.m.css';
@@ -11,20 +12,12 @@ import Spinner from 'components/Spinner';
 import Task from 'components/Task';
 
 export default class Scheduler extends Component {
-    static defaultProps = {
+    state = {
         tasks: [],
         isTasksFetching: false,
         newTaskMessage: '',
         tasksFilter: '',
         isTasksCompleted: false
-    };
-
-    state = {
-        tasks: this.props.tasks,
-        isTasksFetching: this.props.isTasksFetching,
-        newTaskMessage: this.props.newTaskMessage,
-        tasksFilter: this.props.tasksFilter,
-        isTasksCompleted: this.props.isTasksCompleted,
     }
 
     componentDidMount () {
@@ -70,20 +63,22 @@ export default class Scheduler extends Component {
     }
 
     _createTaskAsync = async (event) => {
-        this._setTasksFetchingState(true);
         const { newTaskMessage } = this.state;
+
+        event.preventDefault();
 
         if (newTaskMessage === '') {
             return null;
         }
 
-        event.preventDefault();
+        this._setTasksFetchingState(true);
 
         const task = await api.createTask(newTaskMessage);
 
         this.setState(({ tasks }) => ({
             tasks: [task, ...tasks],
             newTaskMessage: '',
+            isTasksCompleted: false,
         }));
 
         this._setTasksFetchingState(false);
@@ -94,17 +89,37 @@ export default class Scheduler extends Component {
 
         await api.updateTask(task);
 
+        const { tasks } = this.state;
+
+        tasks.forEach((currentTask) => {
+            if (currentTask.id === task.id) {
+                currentTask.completed = task.completed;
+                currentTask.favorite = task.favorite;
+                currentTask.message = task.message;
+            }
+        });
+
+        this.setState({
+            tasks,
+            isTasksCompleted: this._getAllCompleted(tasks),
+        });
+
         this._setTasksFetchingState(false);
     }
 
     _removeTaskAsync = async (id) => {
         this._setTasksFetchingState(true);
 
+        const { tasks } = this.state;
+
         await api.removeTask(id);
 
-        this.setState(({ tasks }) => ({
-            tasks: tasks.filter((task) => task.id !== id),
-        }));
+        const updatedTasks = tasks.filter((task) => task.id !== id);
+
+        this.setState({
+            tasks: updatedTasks,
+            isTasksCompleted: this._getAllCompleted(updatedTasks),
+        });
 
         this._setTasksFetchingState(false);
     }
@@ -155,10 +170,60 @@ export default class Scheduler extends Component {
         }
     }
 
+    _sortTasks = (tasks) => {
+        tasks.sort((prevTask, nextTask) => {
+            const prevTaskCompleted = new Date(prevTask.created);
+            const nextTaskCompleted  = new Date(nextTask.created);
+
+            if (prevTaskCompleted < nextTaskCompleted) {
+                return -1;
+            }
+
+            if (nextTaskCompleted > prevTaskCompleted) {
+                return 1;
+            }
+
+            return 0;
+        });
+
+        tasks.sort((prevTask, nextTask) => {
+            const prevTaskFavorite = prevTask.favorite;
+            const nextTaskFavorite  = nextTask.favorite;
+
+            if (prevTaskFavorite > nextTaskFavorite) {
+                return -1;
+            }
+
+            if (nextTaskFavorite < prevTaskFavorite) {
+                return 1;
+            }
+
+            return 0;
+        });
+
+        tasks.sort((prevTask, nextTask) => {
+            const prevTaskCreated = prevTask.completed;
+            const nextTaskCreated  = nextTask.completed;
+
+            if (prevTaskCreated < nextTaskCreated) {
+                return -1;
+            }
+
+            if (nextTaskCreated > prevTaskCreated) {
+                return 1;
+            }
+
+            return 0;
+        });
+
+        return tasks;
+    }
+
     render () {
         const { tasks, isTasksFetching, newTaskMessage, tasksFilter, isTasksCompleted } = this.state;
+        const sortedTasks = this._sortTasks(tasks);
 
-        const tasksJSX = tasks.map((task) => {
+        const tasksJSX = sortedTasks.map((task) => {
             const { completed, favorite, id, message } = task;
             const regex = new RegExp(tasksFilter, 'i');
 
@@ -206,10 +271,24 @@ export default class Scheduler extends Component {
                                 { `Добавить задачу` }
                             </button>
                         </form>
-                        <div className = { Styles.overlay } />
-                        <ul>
-                            { tasksJSX }
-                        </ul>
+                        <div className = { Styles.overlay }>
+                            <ul>
+                                <FlipMove
+                                    delay = { 0 }
+                                    disableAllAnimations = { false }
+                                    duration = { 400 }
+                                    easing = { "ease-in-out" }
+                                    enterAnimation = { "elevator" }
+                                    leaveAnimation = { "elevator" }
+                                    maintainContainerHeight = { false }
+                                    staggerDelayBy = { 0 }
+                                    staggerDurationBy = { 0 }
+                                    typeName = { "div" }
+                                    verticalAlignment = { "top" }>
+                                    { tasksJSX }
+                                </FlipMove>
+                            </ul>
+                        </div>
                     </section>
                     <footer >
                         <Checkbox
